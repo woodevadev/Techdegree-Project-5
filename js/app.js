@@ -1,29 +1,29 @@
 //Selects the table definitions
 let $liSelector = $('ul li');
 
+//The X for exiting the modal
+let $theX = ('<h1>X</h1><br>');
+$('#content').append($theX);
+
 $('#overlay').hide();
 $('#modal').hide();
 
 let theHTML = '';
 
 //Requests the information from the randomuser server
+//and places it in the lis
 $.ajax({
     url: 'https://randomuser.me/api/?results=12&nat=us',
     dataType: 'json',
     success: function(data) {
         for(let i = 0; i < data.results.length; i ++){
-            theHTML += `<div class='image'>`;
             theHTML += `<img src='${data.results[i].picture.large}' />`
-            theHTML += `</div>`;
-            theHTML += `<div class='info'>`;
             theHTML += `<h4>${data.results[i].name.first} ${data.results[i].name.last}</h4>`;
             theHTML += `<p>${data.results[i].email}</p>`;
-            theHTML += `<p>${data.results[i].location.city}</p></div>`;
-            theHTML += `<div class='hidden'>`;
-            theHTML += `<p>${data.results[i].phone}</p>`;
-            theHTML += `<p>${data.results[i].location.street}, ${data.results[i].location.state} ${data.results[i].location.postcode}</p>`;
-            theHTML += `<p>Birthday: ${data.results[i].dob}</p>`;
-            theHTML += `</div>`;
+            theHTML += `<p>${data.results[i].location.city}</p>`;
+            theHTML += `<p class="hidden">${data.results[i].phone}</p>`;
+            theHTML += `<p class="hidden">${data.results[i].location.street}, ${data.results[i].location.state} ${data.results[i].location.postcode}</p>`;
+            theHTML += `<p class="hidden">Birthday: ${data.results[i].dob}</p>`;
             $($liSelector[i]).html(theHTML);
             $('.hidden').hide();
             theHTML = '';
@@ -40,20 +40,49 @@ let theleft = Math.max($(window).width() - $('#modal').outerWidth(), 0) / 2;
 $('#modal').css('top', thetop + $(window).scrollTop());
 $('#modal').css('left', theleft + $(window).scrollLeft());
 
-//The X for exiting the modal
-let $theX = ('<h1>X</h1>');
+$('.boxes').on('click', function(event){
+    //This if block selects the list item
+    //regardless of where you click on it
+    if($(event.target).attr('itis') == 'box'){
+        var $liList = $(event.target);
+    }else if($(event.target).attr('itis') != 'box'){
+        var $liList = $(event.target).parent();
+    }
 
-//Select content div and append the X
-let $contentDiv = $('.content');
-$contentDiv.append($theX);
+    //This selects the list items children
+    $items = $liList.children();
 
-$('.box').on('click',function(event){
-    let $theImage = $(event.target).children('.image');
-    console.log($theImage);
+    //Initialize the html
+    let $modalHTML = '';
+
+    //This is the HTML for inside the content div
+    $modalHTML += `<img src="${$($items[0]).attr('src')}" />`;
+    $modalHTML += `<h4>${$($items[1]).text()}</h4>`;
+    $modalHTML += `<p>${$($items[2]).text()}</p>`;
+    $modalHTML += `<p>${$($items[3]).text()}</p>`;
+    $modalHTML += `<hr>`;
+    $modalHTML += `<p>${$($items[4]).text()}</p>`;
+    $modalHTML += `<p>${$($items[5]).text()}</p>`;
+    $modalHTML += `<p>${$($items[6]).text()}</p>`;
+
+    //Append html to the content div
+    $('#content').append($modalHTML);
+
+    //Show the modal and the overlay
+    $('#overlay').show();
+    $('#modal').show();
+});
+
+//This block hides the modal and resets its content
+//When you click the x in the top right corner
+$('h1').on('click', function(){
+    $('#overlay').hide();
+    $('#modal').hide();
     
-
-    // $('#overlay').show();
-    // $('#modal').show();
+    $('#content img').remove();
+    $('#content h4').remove();
+    $('#content p').remove();
+    $('#content hr').remove();
 });
 
 
